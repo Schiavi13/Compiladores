@@ -173,7 +173,7 @@ def t_comentario_simple(t):
     t.lexer.lineno += 1
 
 def t_cadena(t):
-    r"\'[^']\'"
+    r"\'([^'])*\'"
     pass
 
 def t_error(t):
