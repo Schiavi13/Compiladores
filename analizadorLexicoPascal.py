@@ -47,45 +47,45 @@ tokens = [
 ]
 
 # Segun la documentacion de ply es mejor definir las palabras reservadas aparte 
-reservadas = {'AND':'and',
-    'ARRAY':'array',
-    'BEGIN':'begin',
-    'CASE':'case',
-    'CONST':'const',
-    'DIV':'div',
-    'DO':'do',
-    'DOWNTO':'downto',
-    'ELSE':'else',
-    'END':'end',
-    'FILE':'file',
-    'FOR':'for',
-    'FUNCTION':'function',
-    'GOTO':'goto',
-    'IF':'if',
-    'IN':'in',
-    'LABEL':'label',
-    'MOD':'mod',
-    'NIL':'nil',
-    'NOT':'not',
-    'OF':'of',
-    'OR':'or',
-    'PACKED':'packed',
-    'PROCEDURE':'procedure',
-    'PROGRAM':'program',
-    'RECORD':'record',
-    'REPEAT':'repeat',
-    'SET':'set',
-    'THEN':'then',
-    'TO':'to',
-    'TYPE':'type',
-    'UNTIL':'until',
-    'VAR':'var',
-    'WHILE':'while',
-    'WITH':'with',
-    }
+reservadas = ['AND',
+    'ARRAY',
+    'BEGIN',
+    'CASE',
+    'CONST',
+    'DIV',
+    'DO',
+    'DOWNTO',
+    'ELSE',
+    'END',
+    'FILE',
+    'FOR',
+    'FUNCTION',
+    'GOTO',
+    'IF',
+    'IN',
+    'LABEL',
+    'MOD',
+    'NIL',
+    'NOT',
+    'OF',
+    'OR',
+    'PACKED',
+    'PROCEDURE',
+    'PROGRAM',
+    'RECORD',
+    'REPEAT',
+    'SET',
+    'THEN',
+    'TO',
+    'TYPE',
+    'UNTIL',
+    'VAR',
+    'WHILE',
+    'WITH',
+]
 
 # se agregan las palabras reservadas a la lista de tokens
-tokens = tokens+list(reservadas.values())
+tokens = tokens+reservadas
 
 t_ignore = '\t'
 # Expresiones regulares para tokens atomicos
@@ -121,14 +121,149 @@ t_QUOTE = r'\''
 
 
 
+def t_AND(t):
+    r'and'
+    return t
+
+def t_ARRAY(t):
+    r'array'
+    return t
+
+def t_BEGIN(t):
+    r'begin'
+    return t
+
+def t_CASE(t):
+    r'case'
+    return t
+
+def t_CONST(t):
+    r'const'
+    return t
+
+def t_DIV(t):
+    r'div'
+    return t
+
+def t_DO(t):
+    r'do'
+    return t
+
+def t_DOWNTO(t):
+    r'downto'
+    return t
+
+def t_ELSE(t):
+    r'else'
+    return t
+
+def t_END(t):
+    r'end'
+    return t
+
+def t_FILE(t):
+    r'file'
+    return t
+
+def t_FOR(t):
+    r'for'
+    return t
+
+def t_FUNCTION(t):
+    r'function'
+    return t
+
+def t_GOTO(t):
+    r'goto'
+    return t
+
+def t_IF(t):
+    r'if'
+    return t
+
+def t_IN(t):
+    r'in'
+    return t
+
+def t_LABEL(t):
+    r'label'
+    return t
+
+def t_MOD(t):
+    r'mod'
+    return t
+
+def t_NIL(t):
+    r'nil'
+    return t
+
+def t_NOT(t):
+    r'not'
+    return t
+
+def t_OF(t):
+    r'of'
+    return t
+
+def t_OR(t):
+    r'or'
+    return t
+
+def t_PACKED(t):
+    r'packed'
+    return t
+
+def t_PROCEDURE(t):
+    r'procedure'
+    return t
+
+def t_PROGRAM(t):
+    r'program'
+    return t
+
+def t_RECORD(t):
+    r'record'
+    return t
+
+def t_REPEAT(t):
+    r'repeat'
+    return t
+
+def t_SET(t):
+    r'set'
+    return t
+
+def t_THEN(t):
+    r'then'
+    return t
+
+def t_TO(t):
+    r'to'
+    return t
+
+def t_TYPE(t):
+    r'type'
+    return t
+
+def t_UNTIL(t):
+    r'until'
+    return t
+
+def t_VAR(t):
+    r'var'
+    return t
+
+def t_WHILE(t):
+    r'while'
+    return t
+
+def t_WITH(t):
+    r'with'
+    return t
 
 def t_NUMBER(t):
     r'\d+(\.\d+)?'
     t.value = float(t.value)
-    return t
-
-def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z_d]*'
     return t
 
 def t_ISNOTEQ(t):
@@ -159,6 +294,13 @@ def t_ASSIGN(t):
     r':='
     return t
 
+def t_ID(t):
+    r'[a-zA-Z_][a-zA-Z_d]*'
+    if t.value.upper() in reservadas:
+        t.value = t.value.upper()
+        t.type = t.value
+    return t
+
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
@@ -173,7 +315,8 @@ def t_comentario_simple(t):
     t.lexer.lineno += 1
 
 def t_cadena(t):
-    r"\'([^'])*\'"
+    #r"\'[^']\'"
+    r"\'([^'])*'"
     pass
 
 def t_error(t):
@@ -198,7 +341,7 @@ if __name__ == '__main__':
 	if (len(sys.argv) > 1):
 		fin = sys.argv[1]
 	else:
-		fin = 'holamundo.pas'
+		fin = 'fibo.pas'
 	f = open(fin, 'r')
 	data = f.read()
 	print (data)
