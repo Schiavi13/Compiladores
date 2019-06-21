@@ -43,7 +43,11 @@ tokens = [
 
     # otros
     'ID',
-    'NUMBER',   
+    #nombres de tipos
+    'REAL',
+    'INTEGER',
+    'STRING',
+    'CHAR',  
 ]
 
 # Segun la documentacion de ply es mejor definir las palabras reservadas aparte 
@@ -82,6 +86,11 @@ reservadas = ['AND',
     'VAR',
     'WHILE',
     'WITH',
+    #nombres de tipos
+    'TREAL',
+    'TINTEGER',
+    'TSTRING',
+    'TCHAR',
 ]
 
 # se agregan las palabras reservadas a la lista de tokens
@@ -113,13 +122,19 @@ t_NUMSIGN = r'\#'
 t_AMPERSAND = r'&'
 t_PERCENT = r'%'
 t_BACKQUOTE = r'`'
-t_WHITESPACE = r'\s+'
+t_WHITESPACE = r'\s'
 t_TILDE = r'~'
 t_BAR = r'\|'
 t_EXCLAMATION = r'!'
 t_QUOTE = r'\''
 
 
+def t_ID(t):
+    #r'[a-zA-Z_][a-zA-Z_d]*|&\s([a-zA-Z_][a-zA-Z_d]*)+'
+    r'[a-zA-Z]([a-zA-Z0-9])*'
+    if t.value.lower() in reservadas:
+        t.type = reservadas[t.value.lower()]
+    return t
 
 def t_AND(t):
     r'and'
@@ -261,9 +276,20 @@ def t_WITH(t):
     r'with'
     return t
 
-def t_NUMBER(t):
-    r'\d+(\.\d+)?'
-    t.value = float(t.value)
+def t_TREAL(t):
+    r'real'
+    return t
+
+def t_TINTEGER(t):
+    r'integer'
+    return t
+
+def t_TSTRING(t):
+    r'string'
+    return t
+
+def t_TCHAR(t):
+    r'char'
     return t
 
 def t_ISNOTEQ(t):
@@ -293,26 +319,55 @@ def t_SUBRANGE(t):
 def t_ASSIGN(t):
     r':='
     return t
+def t_REAL(t):
+    r'(\-)*[0-9]+\.[0-9]+'
+    return t
 
-def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z_d]*'
-    if t.value.upper() in reservadas:
-        t.value = t.value.upper()
-        t.type = t.value
+def t_INTEGER(t):
+    r'(\-)*[0-9]+'
+    return t
+
+def t_CHAR(t):
+    r'(\'([^\\\'])\')|(\"([^\\\"])\")'
+    return t
+
+def t_STRING(t):
+    r'(\"([^\\\"]|(\\.))*\")|(\'([^\\\']|(\\.))*\')'
+    escaped = 0 
+    str = t.value[1:-1] 
+    new_str = '' 
+    for i in range(0, len(str)): 
+        c = str[i] 
+        if escaped: 
+            if c == 'n': 
+                c = '\n' 
+            elif c == 't': 
+                c = '\t' 
+            new_str += c 
+            escaped = 0 
+        else: 
+            if c == '\\': 
+                escaped = 1 
+            else: 
+                new_str += c 
+    t.value = new_str 
     return t
 
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
+    pass
 
 
 def t_comentario_multi(t):
     r'\(\*(.|\n)*?\*\) | \{(.|\n)*?\}'
     t.lexer.lineno += t.value.count('\n')
+    pass
 
 def t_comentario_simple(t):
     r'//(.)*?\n'
     t.lexer.lineno += 1
+    pass
 
 def t_cadena(t):
     #r"\'[^']\'"
